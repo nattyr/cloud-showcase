@@ -1,0 +1,55 @@
+on:
+    push:
+        branches:
+            - main
+        paths: 'terraform/**'
+
+permissions:
+    id-token: write
+    contents: read
+
+env:
+  TF_LOG: INFO
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./terraform
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with: 
+          role-to-assume: arn:aws:iam::${{secrets.AWS_ACCOUNT_ID}}:role/${{secrets.AWS_ROLE_NAME}}
+          aws-region: ${{vars.AWS_REGION}}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        id: init
+        env:
+          AWS_BUCKET_KEY_NAME: ${{secrets.AWS_TFSTATE_KEY_NAME}}
+        run: terraform init -backend-config="bucket=${{secrets.AWS_TFSTATES_BUCKET_NAME}}" -backend-config="key=${{secrets.AWS_TFSTATE_KEY_NAME}}" -backend-config="region=${{vars.AWS_REGION}}"
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color
+        continue-on-error: true
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
