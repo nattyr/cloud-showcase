@@ -1,0 +1,32 @@
+on:
+  push:
+    branches:
+      - main
+    paths: 'website/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_LOG: INFO
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./website
+    steps:
+        - name: Git checkout
+          uses: actions/checkout@v4
+
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v4
+          with: 
+            role-to-assume: arn:aws:iam::${{secrets.AWS_ACCOUNT_ID}}:role/${{secrets.AWS_ROLE_NAME}}
+            aws-region: ${{vars.AWS_REGION}}
+        
+        - name: Upload website contents
+          run: aws s3 cp . s3://${{vars.AWS_WEBSITE_BUCKET_NAME}}/ --recursive
