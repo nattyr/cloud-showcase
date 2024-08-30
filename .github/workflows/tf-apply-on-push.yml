@@ -1,12 +1,12 @@
 on:
-    push:
-        branches:
-            - main
-        paths: 'terraform/**'
+  push:
+    branches:
+      - main
+    paths: 'terraform/**'
 
 permissions:
-    id-token: write
-    contents: read
+  id-token: write
+  contents: read
 
 env:
   TF_LOG: INFO

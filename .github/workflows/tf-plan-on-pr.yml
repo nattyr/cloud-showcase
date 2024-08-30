@@ -1,13 +1,13 @@
 on:
-    pull_request:
-        branches:
-            - main
-        paths: 'terraform/**'
+  pull_request:
+    branches:
+      - main
+    paths: 'terraform/**'
 
 permissions:
-    id-token: write
-    contents: read
-    pull-requests: write
+  id-token: write
+  contents: read
+  pull-requests: write
 
 env:
   TF_LOG: INFO
