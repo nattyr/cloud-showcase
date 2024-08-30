@@ -64,3 +64,14 @@ resource "aws_s3_bucket_policy" "resume_bucket_policy" {
     ]
   })
 }
+
+resource "aws_s3_bucket" "log_bucket" {
+  bucket = "log-bucket-nr"
+}
+
+resource "aws_s3_bucket_logging" "cloud-resume-website-logging" {
+  bucket = aws_s3_bucket.cloud-resume-website.id
+
+  target_bucket = aws_s3_bucket.log_bucket.id
+  target_prefix = "cloud-resume-website_log/"
+}
