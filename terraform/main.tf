@@ -22,22 +22,22 @@ resource "aws_route53_zone" "resume_hosted_zone" {
 resource "aws_route53_record" "resume_cert_dns_records" {
   for_each = {
     for dvo in aws_acm_certificate.resume_cert.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
+      name = dvo.resource_record_name
       record = dvo.resource_record_value
-      type   = dvo.resource_record_type
+      type = dvo.resource_record_type
     }
   }
 
   allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 60
-  type            = each.value.type
-  zone_id         = aws_route53_zone.resume_hosted_zone.zone_id
+  name = each.value.name
+  records = [each.value.record]
+  ttl = 60
+  type = each.value.type
+  zone_id = aws_route53_zone.resume_hosted_zone.zone_id
 }
 
 resource "aws_cloudfront_origin_access_control" "resume_oac" {
-  name       = "resume-cloudfront-oac"
+  name = "resume-cloudfront-oac"
   origin_access_control_origin_type = "s3"
   signing_behavior = "always"
   signing_protocol = "sigv4"
@@ -46,17 +46,17 @@ resource "aws_cloudfront_origin_access_control" "resume_oac" {
 resource "aws_cloudfront_distribution" "resume_distribution" {
   origin {
     domain_name = aws_s3_bucket.cloud-resume-website.bucket_regional_domain_name
-    origin_id   = "S3-resume-bucket"
+    origin_id = "S3-resume-bucket"
     origin_access_control_id = aws_cloudfront_origin_access_control.resume_oac.id
   }
 
-  enabled             = true
-  is_ipv6_enabled     = true
+  enabled = true
+  is_ipv6_enabled = true
   default_root_object = "index.html"
 
   default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods   = ["GET", "HEAD"]
+    allowed_methods = ["GET", "HEAD"]
+    cached_methods = ["GET", "HEAD"]
     target_origin_id = "S3-resume-bucket"
 
     forwarded_values {
@@ -67,9 +67,9 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
     }
 
     viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    min_ttl = 0
+    default_ttl = 3600
+    max_ttl = 86400
   }
 
   restrictions {
@@ -90,14 +90,22 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
 
 resource "aws_route53_record" "cloud_alias_dns_record" {
   zone_id = aws_route53_zone.resume_hosted_zone.zone_id
-  name    = "nathanrichardson.dev"
-  type    = "A"
+  name = "nathanrichardson.dev"
+  type = "A"
 
   alias {
-    name                   = aws_cloudfront_distribution.resume_distribution.domain_name
-    zone_id                = aws_cloudfront_distribution.resume_distribution.hosted_zone_id
+    name = aws_cloudfront_distribution.resume_distribution.domain_name
+    zone_id = aws_cloudfront_distribution.resume_distribution.hosted_zone_id
     evaluate_target_health = false
   }
+}
+
+resource "aws_route53_record" "cloud_www_dns_record" {
+  zone_id = aws_route53_zone.resume_hosted_zone.zone_id
+  name = "www.nathanrichardson.dev"
+  type = "CNAME"
+  ttl = 300
+  records = ["nathanrichardson.dev"]
 }
 
 resource "aws_s3_bucket_policy" "resume_bucket_policy" {
