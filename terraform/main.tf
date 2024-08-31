@@ -5,6 +5,37 @@ resource "aws_s3_bucket" "cloud-resume-website" {
     }
 }
 
+resource "aws_acm_certificate" "resume_cert" {
+  domain_name = "nathanrichardson.dev"
+  subject_alternative_names = ["*.nathanrichardson.dev"]
+  validation_method = "DNS"
+
+  tags = {
+    Name = "nathanrichardson.dev_cert"
+  }
+}
+
+resource "aws_route53_zone" "resume_hosted_zone" {
+  name = "nathanrichardson.dev"
+}
+
+resource "aws_route53_record" "resume_cert_dns_records" {
+  for_each = {
+    for dvo in aws_acm_certificate.resume_cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = aws_route53_zone.resume_hosted_zone.zone_id
+}
+
 resource "aws_cloudfront_origin_access_control" "resume_oac" {
   name       = "resume-cloudfront-oac"
   origin_access_control_origin_type = "s3"
