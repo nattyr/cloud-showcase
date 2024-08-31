@@ -78,8 +78,13 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
     }
   }
 
+  aliases = ["nathanrichardson.dev", "www.nathanrichardson.dev"]
+
   viewer_certificate {
-    cloudfront_default_certificate = true
+    cloudfront_default_certificate = false
+    acm_certificate_arn = aws_acm_certificate.resume_cert.arn
+    ssl_support_method = "sni-only"
+    minimum_protocol_version = "TLSv1"
   }
 }
 
