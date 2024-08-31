@@ -88,6 +88,18 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
   }
 }
 
+resource "aws_route53_record" "cloud_alias_dns_record" {
+  zone_id = aws_route53_zone.resume_hosted_zone.zone_id
+  name    = "nathanrichardson.dev"
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.resume_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.resume_distribution.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
 resource "aws_s3_bucket_policy" "resume_bucket_policy" {
   bucket = aws_s3_bucket.cloud-resume-website.id
 
