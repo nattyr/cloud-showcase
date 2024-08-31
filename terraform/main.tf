@@ -6,10 +6,10 @@ resource "aws_s3_bucket" "cloud-resume-website" {
 }
 
 resource "aws_acm_certificate" "resume_cert" {
+  provider = aws.us_east_1
   domain_name = "nathanrichardson.dev"
   subject_alternative_names = ["*.nathanrichardson.dev"]
   validation_method = "DNS"
-
   tags = {
     Name = "nathanrichardson.dev_cert"
   }
