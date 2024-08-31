@@ -5,17 +5,6 @@ resource "aws_s3_bucket" "cloud-resume-website" {
     }
 }
 
-resource "aws_s3_bucket" "log_bucket" {
-  bucket = "log-bucket-nr"
-}
-
-resource "aws_s3_bucket_logging" "cloud-resume-website-logging" {
-  bucket = aws_s3_bucket.cloud-resume-website.id
-
-  target_bucket = aws_s3_bucket.log_bucket.id
-  target_prefix = "cloud-resume-website_log/"
-}
-
 resource "aws_cloudfront_origin_access_control" "resume_oac" {
   name       = "resume-cloudfront-oac"
   origin_access_control_origin_type = "s3"
@@ -33,12 +22,6 @@ resource "aws_cloudfront_distribution" "resume_distribution" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
-
-  logging_config {
-    include_cookies = false
-    bucket          = "${aws_s3_bucket.log_bucket.bucket_domain_name}"
-    prefix          = "resume_distribution_log/"
-  }
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
