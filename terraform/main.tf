@@ -16,10 +16,18 @@ resource "aws_s3_bucket_logging" "cloud-resume-website-logging" {
   target_prefix = "cloud-resume-website_log/"
 }
 
+resource "aws_cloudfront_origin_access_control" "resume_oac" {
+  name       = "resume-cloudfront-oac"
+  origin_access_control_origin_type = "s3"
+  signing_behavior = "always"
+  signing_protocol = "sigv4"
+}
+
 resource "aws_cloudfront_distribution" "resume_distribution" {
   origin {
     domain_name = aws_s3_bucket.cloud-resume-website.bucket_regional_domain_name
     origin_id   = "S3-resume-bucket"
+    origin_access_control_id = aws_cloudfront_origin_access_control.resume_oac.id
   }
 
   enabled             = true
@@ -81,4 +89,3 @@ resource "aws_s3_bucket_policy" "resume_bucket_policy" {
     ]
   })
 }
-
