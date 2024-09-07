@@ -130,7 +130,7 @@ resource "aws_s3_bucket_policy" "resume_bucket_policy" {
 }
 
 resource "aws_dynamodb_table" "website_visits_log_db" {
-  name = "WebsiteVisits"
+  name = "WebsiteVisitsLog"
   billing_mode = "PAY_PER_REQUEST"
   hash_key = "IPAddress"
   range_key = "DateTime"
@@ -147,7 +147,7 @@ resource "aws_dynamodb_table" "website_visits_log_db" {
 }
 
 resource "aws_dynamodb_table" "website_visits_counter_db" {
-  name = "WebsiteVisits"
+  name = "WebsiteVisitsCounter"
   billing_mode = "PAY_PER_REQUEST"
   hash_key = "PageName"
 
