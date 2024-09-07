@@ -128,3 +128,121 @@ resource "aws_s3_bucket_policy" "resume_bucket_policy" {
     ]
   })
 }
+
+resource "aws_dynamodb_table" "website_visits_log_db" {
+  name = "WebsiteVisits"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key = "IPAddress"
+  range_key = "DateTime"
+
+  attribute {
+    name = "IPAddress"
+    type = "S"
+  }
+
+  attribute {
+    name = "DateTime"
+    type = "S"
+  }
+
+  tags = {
+    Name = "website_visits_log"
+  }
+}
+
+resource "aws_dynamodb_table" "website_visits_counter_db" {
+  name = "WebsiteVisits"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key = "IPAddress"
+
+  attribute {
+    name = "PageName"
+    type = "S"
+  }
+
+  attribute {
+    name = "Count"
+    type = "S"
+  }
+
+  tags = {
+    Name = "website_visits_counter"
+  }
+}
+
+resource "aws_iam_role" "lambda_role" {
+  name = "lambda_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "lambda_policy" {
+  name   = "lambda_policy"
+  description = "IAM policy for lambda"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Effect   = "Allow",
+        Resource = "arn:aws:logs:*:*:*"
+      },
+      {
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem"
+        ],
+        Effect   = "Allow",
+        Resource = [
+          aws_dynamodb_table.website_visits_log_db.arn,
+          aws_dynamodb_table.website_visits_counter_db.arn
+        ]
+          
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = aws_iam_policy.lambda_policy.arn
+}
+
+data "archive_file" "log_visitor_zip" {
+  type        = "zip"
+  source_file  = "../lambda/log_visitor.py"
+  output_path = "log_visitor.zip"
+}
+
+resource "aws_lambda_function" "log_visitor_lambda" {
+  function_name = "log_visitor"
+  filename = data.archive_file.log_visitor_zip.output_path
+  source_code_hash = data.archive_file.log_visitor_zip.output_base64sha512
+  role = aws_iam_role.lambda_role.lambda_role.arn
+  handler = "log_visitor.hit"
+  runtime = "python3.12"
+  environment {
+    variables = {
+      LOG_TABLE_NAME = aws_dynamodb_table.website_visits_log_db.name
+      COUNT_TABLE_NAME = aws_dynamodb_table.website_visits_counter_db.name
+    }
+  }
+}
