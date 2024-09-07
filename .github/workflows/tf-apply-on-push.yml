@@ -24,9 +24,6 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v4
 
-      - name: Zip Visitor Lambda Function
-        run: zip log_visitor.zip ../lambda/log_visitor.py
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with: 
