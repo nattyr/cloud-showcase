@@ -267,3 +267,14 @@ resource "aws_lambda_permission" "api_gateway" {
   principal = "apigateway.amazonaws.com"
   source_arn = "${aws_api_gateway_rest_api.visitor.execution_arn}/*/*"
 }
+
+resource "aws_api_gateway_deployment" "visitor_prod" {
+  rest_api_id = aws_api_gateway_rest_api.visitor.id
+  stage_name  = "prod"
+}
+
+resource "aws_api_gateway_stage" "visitor_prod" {
+  stage_name    = aws_api_gateway_deployment.visitor_prod.stage_name
+  deployment_id = aws_api_gateway_deployment.visitor_prod.id
+  rest_api_id   = aws_api_gateway_rest_api.visitor.id
+}
