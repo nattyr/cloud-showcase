@@ -249,6 +249,7 @@ resource "aws_api_gateway_method" "visitor_get" {
   resource_id = aws_api_gateway_resource.my_resource.id
   http_method = "GET"
   authorization = "NONE"
+  api_key_required = true
 }
 
 resource "aws_api_gateway_integration" "visitor_lambda_integration" {
@@ -270,11 +271,45 @@ resource "aws_lambda_permission" "api_gateway" {
 
 resource "aws_api_gateway_deployment" "visitor_prod" {
   rest_api_id = aws_api_gateway_rest_api.visitor.id
-  stage_name  = "prod"
+
+  depends_on = [aws_api_gateway_method.visitor_get]
+}
+
+resource "aws_api_gateway_api_key" "visitor" {
+  name        = "VisitorApiKey"
+  description = "API key with rate throttling"
+  enabled     = true
 }
 
 resource "aws_api_gateway_stage" "visitor_prod" {
-  stage_name    = aws_api_gateway_deployment.visitor_prod.stage_name
+  stage_name    = "prod"
   deployment_id = aws_api_gateway_deployment.visitor_prod.id
   rest_api_id   = aws_api_gateway_rest_api.visitor.id
+}
+
+resource "aws_api_gateway_usage_plan" "visitor" {
+  name = "VisitorUsagePlan"
+
+  api_stages {
+    api_id = aws_api_gateway_rest_api.visitor.id
+    stage  = aws_api_gateway_stage.visitor_prod.stage_name
+  }
+
+  throttle_settings {
+    burst_limit = 7
+    rate_limit  = 3
+  }
+
+  quota_settings {
+    limit  = 200
+    period = "DAY"
+  }
+
+  depends_on = [aws_api_gateway_stage.visitor_prod]
+}
+
+resource "aws_api_gateway_usage_plan_key" "visitor_throttle" {
+  key_id        = aws_api_gateway_api_key.visitor.id
+  key_type      = "API_KEY"
+  usage_plan_id = aws_api_gateway_usage_plan.visitor.id
 }
