@@ -8,6 +8,12 @@ dynamodb = boto3.resource('dynamodb')
 log_table_name = os.environ.get('LOG_TABLE_NAME')
 count_table_name = os.environ.get('COUNT_TABLE_NAME')
 
+cors_headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET",
+    "Access-Control-Allow-Headers": "x-api-key"
+}
+
 def log_hit(ip, log_datetime):
     try:
         table = dynamodb.Table(log_table_name)
@@ -67,6 +73,7 @@ def hit(event, context):
 
         return {
             'statusCode': 200,
+            'headers': cors_headers,
             'body': json.dumps({'count': str(count)})
         }
     
@@ -74,5 +81,6 @@ def hit(event, context):
         print(f"Error: {e}")
         return {
             'statusCode': 500,
+            'headers': cors_headers,
             'body': json.dumps({'error': 'Internal Server Error'})
         }
