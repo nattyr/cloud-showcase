@@ -125,6 +125,19 @@ resource "aws_api_gateway_stage" "visitor_prod" {
   rest_api_id = aws_api_gateway_rest_api.visitor.id
 }
 
+resource "aws_api_gateway_method_settings" "visitor_prod_rate_limit" {
+  rest_api_id = aws_api_gateway_rest_api.visitor.id
+  stage_name  = aws_api_gateway_stage.visitor_prod.stage_name
+  method_path = "*/*"
+
+  settings {
+    throttling_burst_limit = 7
+    throttling_rate_limit  = 3
+  }
+
+  depends_on = [aws_api_gateway_stage.visitor_prod]
+}
+
 resource "aws_api_gateway_usage_plan" "visitor" {
   name = "VisitorUsagePlan"
 
