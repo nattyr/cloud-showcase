@@ -1,12 +1,189 @@
 <html>
 
 <head>
-  <title>Test</title>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <title>Nathan Richardson</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="styles.css">
+  <script src="hit.js"></script>
+
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+    rel="stylesheet">
 </head>
 
 <body>
-  <p>Test index file. Rev. 2</p>
+  <div class="nav-bar">
+    <img src="favicon.ico">
+    <p id="title">nathanrichardson.dev</p>
+    <p id="visitor_text">You are the <strong><span id="visitor_num">...</span>th</strong> visitor!</p>
+  </div>
+  <div class="content">
+    <p>Welcome! What you're seeing right now is the end result, the culmination, and the visual facade of a full-fledged
+      production ready system. This project deploys a host of AWS infrastructure as well as everything you're seeing via
+      a CI/CD pipeline directly to the cloud. <br><br>
+
+      This project's purpose has been to push my skills beyond where I've gone before, and of course - to show you, the
+      reader, a portion of my IT skill set. It's been a fun journey for me and I'm excited to show you where it's taken
+      me. So, stick around and have a scroll through; and, if you have any feedback, feel free to contact me.</p>
+    <h1>Technologies Used</h1>
+    <hr>
+    <div class="table_container" role="region" tabindex="0">
+      <table>
+        <thead></thead>
+        <tr>
+          <th class="column1">CI/CI Tools</th>
+          <th class="column2">Purpose</th>
+        </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Terraform</strong>
+            </td>
+            <td>Defines and manages all AWS infrastructure as code</td>
+          </tr>
+          <tr>
+            <td><strong>Git</strong>
+            </td>
+            <td>Version control for the project which is hosted on Github</td>
+          </tr>
+          <tr>
+            <td><strong>GitHub Actions</strong>
+            </td>
+            <td>CI/CD platform - automates the build, test, and deployment processes</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table>
+        <thead></thead>
+        <tr>
+          <th class="column1">AWS Technologies</th>
+          <th class="column2">Purpose</th>
+        </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>AWS IAM</strong>
+            </td>
+            <td>Access &amp; permissions management</td>
+          </tr>
+          <tr>
+            <td><strong>AWS IAM OIDC</strong>
+            </td>
+            <td>Securely provides temporary AWS access tokens to GitHub Actions</td>
+          </tr>
+          <tr>
+            <td><strong>AWS S3</strong>
+            </td>
+            <td>Storage container for this website's content, and for Terraform state
+              files</td>
+          </tr>
+          <tr>
+            <td><strong>AWS Certificate Manager</strong>
+            </td>
+            <td>Provisioning SSL certificate for nathanrichardson.dev</td>
+          </tr>
+          <tr>
+            <td><strong>AWS Route 53</strong>
+            </td>
+            <td>DNS for nathanrichardson.dev</td>
+          </tr>
+          <tr>
+            <td><strong>AWS CloudFront</strong>
+            </td>
+            <td>CDN for nathanrichardson.dev</td>
+          </tr>
+          <tr>
+            <td><strong>AWS DynamoDB</strong>
+            </td>
+            <td>Stores and logs the number of visitors to the website</td>
+          </tr>
+          <tr>
+            <td><strong>AWS API Gateway</strong>
+            </td>
+            <td>Serves the API endpoint used for logging website visits</td>
+          </tr>
+          <tr>
+            <td><strong>AWS Lambda</strong>
+            </td>
+            <td>Serves the backend logic for the above mentioned API endpoint</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table>
+        <thead></thead>
+        <tr>
+          <th class="column1">CI/CI Tools</th>
+          <th class="column2">Purpose</th>
+        </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>HCL</strong>
+            </td>
+            <td>HashiCorp Configuration Language - used in Terraform configuration files</td>
+          </tr>
+          <tr>
+            <td><strong>Python</strong>
+            </td>
+            <td>Defines and manages all AWS infrastructure as code</td>
+          </tr>
+          <tr>
+            <td><strong>JavaScript</strong>
+            </td>
+            <td>Visitor count logic for the website</td>
+          </tr>
+          <tr>
+            <td><strong>HTML &amp; CSS</strong>
+            </td>
+            <td>Website content and styling</td>
+          </tr>
+          <tr>
+            <td><strong>Bash</strong>
+            </td>
+            <td>Used for git Git command line</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h1>Digging Deeper</h1>
+    <hr>
+    <p>
+      A deeper explanation of the project and it's working parts. <strong>Coming soon…</strong><br><br>
+
+      In the meantime - please feel free to check out my public <a href="https://github.com/nattyr/cloud-resume">GitHub
+        repository</a>, where you'll find the entirety
+      of the project available for your inspection.
+    </p>
+
+    <h1>TODO:</h1>
+    <hr>
+    <p>
+      One of my main objectives for this project has been to design it with a production ready mind-set, however, I have
+      afforded myself some freedoms to best serve my learning process.<br><br>
+
+      Here's my personal list of changes I'm intending to align the project further with what I'd want in a true
+      production system:
+    </p>
+    <ol type="1">
+      <li><u>Write unit tests for the Python &amp; JavaScript code.</u> The pipeline is
+        currently missing unit tests for the Python lambda functions and the JavaScript
+        code on the website</li>
+      <li><u>Split the Terraform configuration files into logical components.</u> The configuration
+        has grown greatly over the course of the ever-expanding scope of this project,
+        and is needing some clean restructuring.</li>
+      <li><u>Standardise the naming convention for Terraform resource IDs used across
+          the project.</u> There's currently an inconsistency in the naming due to my
+        styling changing along the way as I increased my familiarisation with Terraform.</li>
+      <li><u>Design a solution for managing the IAM role used by the OIDC integration
+          with GitHub Actions.</u> The permissions for this role are currently managed
+        directly via the AWS console.</li>
+    </ol>
+  </div>
 </body>
 
 </html>
