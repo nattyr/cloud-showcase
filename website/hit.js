@@ -20,10 +20,16 @@ async function getVisitorCount() {
     }
 }
 
+function getNumberWithOrdinal(n) {
+    var s = ["th", "st", "nd", "rd"],
+        v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
 async function insertVisitorNum() {
     const count = await getVisitorCount();
     const spanElement = document.getElementById(visitorNumSpanId);
-    const textToInsert = count !== null ? count : '999';
+    const textToInsert = count !== null ? getNumberWithOrdinal(count) : '999th';
     spanElement.textContent = textToInsert;
 }
 
