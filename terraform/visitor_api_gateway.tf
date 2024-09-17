@@ -88,7 +88,7 @@ resource "aws_api_gateway_integration_response" "visitor_options" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'X-Api-Key'"
     "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'https://nathanrichardson.dev'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 
   depends_on = [aws_api_gateway_integration.visitor_options]
